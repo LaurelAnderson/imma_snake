@@ -1,4 +1,7 @@
 #include <iostream>
+#include <ncurses.h>
+
+using namespace std; 
 
 //enumerator
 enum sDirect { STOP = 0, LEFT, RIGHT, UP, DOWN };
@@ -7,12 +10,20 @@ sDirect dir;
 //variables
 bool gameOver; 
 const int board_width = 30; 
-const int board_length = 30;
+const int board_length = 20;
 char board[board_width][board_length];
 int x, y, ball_Y, ball_X, score;
+
 using namespace std;
 
 void gameStart(){
+
+	// ncurses settings
+	initscr();
+    cbreak();
+    noecho();
+    scrollok(stdscr, TRUE); 
+    nodelay(stdscr, TRUE); 
 
 	//set the start settings
 	gameOver = false;
@@ -25,38 +36,60 @@ void gameStart(){
 
 }
 
-void draw(){
+void draw(WINDOW * win){
 
-	system("clear");
+	box(win, 0, 0); 
+	wrefresh(win);
 
-	for(int i = 0; i < board_length; i++){
+	// mvwprintw(win, 0, 0, "Score: %i", score);
 
-		for(int j = 0; j < board_width; j++){
+}
 
-			if (i == 0 || i == board_length - 1) {
+void userInput(){
 
-			    board[i][j] = '0';
+	switch (getch()){
 
-			}else if (j == 0 || j == board_width - 1){
-
-				board[i][j] = '0'; 
-
-			}else{
-
-				board[i][j] = ' ';
-			}
-
-			std::cout << board[i][j];
-		}
-
-		std::cout << endl;
+		case 'a':
+			dir = LEFT;
+			// printw("LEFT\n"); 
+			break; 
+		case 's':
+			dir = DOWN;
+			// printw("DOWN\n"); 
+			break; 
+		case 'd': 
+			dir = RIGHT; 
+			// printw("RIGHT\n");
+			break; 
+		case 'w':
+			dir = UP;
+			// printw("UP\n"); 
+			break; 
+		// testing
+		case 'q':
+			gameOver = true;
+			break; 
 	}
+	// napms(200);
+	// printw("Running\n");
 
 }
 
 int main(){
 
-	std::cout << "Hello there!\n";
-	draw();
+	gameStart(); 
+
+	//main window
+	WINDOW * win = newwin(board_length, board_width, 10, 10);
+	refresh(); 
+
+	while(!gameOver){
+		draw(win);
+		userInput(); 
+	}
+
+	int test = getch(); 
+
+	endwin(); 
 	return 0;
 }
